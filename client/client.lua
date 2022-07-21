@@ -1,154 +1,157 @@
-local starting = false
-local already = false
-local count = {}
-local createdped = {}
-local chossenCoords = {}
+local CanStartAmbush = false
+local Canstart = true
+local myCreatedPeds = {}
+local CanstartMission = true
 
-function Missionstart()
 
-	for index, value in pairs(Config.Bandits) do
-		chossenCoords = value.outlawsLocation
-		local modelNumeroRandom = math.random(6)
-		local modelRandom = value.outlawsModels[modelNumeroRandom].hash
-		local modelHash = GetHashKey(modelRandom)
-
-		RequestModel(modelHash)
-		if not HasModelLoaded(modelHash) then
-			RequestModel(modelHash)
-		end
-
-		while not HasModelLoaded(modelHash) do
-			Wait(0)
-		end
-
-		createdped[index] = CreatePed(modelHash, value.x, value.y, value.z, true, true, true, true)
-		Citizen.InvokeNative(0x283978A15512B2FE, createdped[index], true)
-		Citizen.InvokeNative(0x23f74c2fda6e7c61, 953018525, createdped[index])
-		Citizen.InvokeNative(0x8D9BFCE3352DE47F, createdped[index])
-		TaskCombatPed(createdped[index], PlayerPedId())
-		count[index] = createdped[index]
-
+---------------- NPC ---------------------
+function LoadModel(model)
+	local Model = GetHashKey(model)
+	RequestModel(Model)
+	while not HasModelLoaded(Model) do
+		RequestModel(model)
+		Citizen.Wait(100)
 	end
-
-	starting = true
-	Wait(1000)
 end
 
-CreateThread(function()
-	local AlivePed = #chossenCoords
-	local playerID = PlayerId()
-	--local qued = Citizen.InvokeNative(0x8D9BFCE3352DE47F, v)
-	while starting do
-
-		for key, peds in pairs(createdped) do
-			if IsEntityDead(peds) then
-				if count[key] then
-					AlivePed = AlivePed - 1
-					count[key] = nil
-					if AlivePed == 0 then
-						TriggerEvent('vorp:ShowTopNotification', "~e~You Have Defeated The Bandits!", "Safe Travels...", 4000)
-						Wait(Config.Cooldown)
-						starting = false
-						already = false
-						table.remove { createdped }
-						table.remove { count }
-
-					end
+function AreMissionPedsAlive()
+	if CanStartAmbush then
+		for _, ped in ipairs(myCreatedPeds) do
+			if DoesEntityExist(ped) then
+				if not IsEntityDead(ped) then
+					return true
 				end
 			end
-			if IsPlayerDead(playerID) then
-				Stopmission()
-			end
 		end
-		Wait(0)
 	end
-end)
-
-
-
-function Stopmission()
-	Wait(1000)
-	pressing = false
-	starting = false
-	already = false
-	--if IsEntityDead(count) and IsEntityDead(createdped) then
-	for k, v in pairs(createdped) do
-		DeletePed(v)
-		DeletePed(count[k])
-
-		Wait(500)
-	end
-	table.remove { createdped }
-	table.remove { count }
-	createdped = {}
-	count = {}
-	print("missiondone")
+	return false
 end
 
 CreateThread(function()
-	while true do
+	while Canstart do
+		Wait(0)
+		local playerID = PlayerId()
+		local playerDead = IsPlayerDead(playerID)
 		local playerPed = PlayerPedId()
 		local coords = GetEntityCoords(playerPed)
-
-		for k, Location in pairs(Config.Bandits) do
-
-			--for key, value in pairs(first) do
+		local sleep = true
+		print(CanstartMission)
+		for key, Location in pairs(Config.Outlaws) do
 
 			local coordsDist = vector3(coords.x, coords.y, coords.z)
 			local coordsLocation = vector3(Location.x, Location.y, Location.z)
 			local distance = #(coordsDist - coordsLocation)
 
-			if distance <= 13.0 and not already then
-				local random = math.random(1, 10)
+			if distance <= Location.DistanceTriggerMission then
+				sleep = false --break the loop
+				local random = math.random(Location.Random.min, Location.Random.max)
 
-				if random <= Location.luckynumber then
-					print(random)
-					--startdialog()
-					Missionstart()
+				if CanstartMission and playerDead ~= true then
+					TriggerServerEvent("vorp_outlaws:once", key)
+					Wait(200)
+					print("wait for trigger")
 
-					already = true
-				else
-					if random > 2 and not already then
-						stopmission()
-						print(random)
+					if random == Location.luckynumber then -- start ambush
+
+						Wait(100)
+						Canstart = false
+						-- check if can start
+						TriggerEvent('vorp:ShowTopNotification', "~e~AMBUSH", Location.Notification, 4000)
+
+						for _, positions in pairs(Location.outlawsLocation) do
+
+							local modelNumeroRandom = math.random(1, 1)
+							local modelRandom = Location.outlawsModels[modelNumeroRandom].hash
+							local modelHash = GetHashKey(modelRandom)
+							LoadModel(modelRandom)
+
+
+							local createdped = CreatePed(modelHash, positions.x, positions.y, positions.z, true, true, true, true)
+
+							if DoesEntityExist(createdped) then
+								local bliptype = Location.BlipHandle -- add to config
+								Citizen.InvokeNative(0x283978A15512B2FE, createdped, true) -- random outfit
+								Citizen.InvokeNative(0x23f74c2fda6e7c61, bliptype, createdped) -- blip 
+								--CanPedBeMounted(createdped, false)
+								TaskCombatPed(createdped, PlayerPedId()) -- combat ped
+								Wait(100)
+								myCreatedPeds[#myCreatedPeds + 1] = createdped -- add to table
+								SetModelAsNoLongerNeeded(modelHash)
+								CanStartAmbush = true
+								Wait(100)
+							end
+
+						end
+
+					else
+						Wait(Location.CheckLuckyNumber) -- add a wait untill the mission can run again to stop looping
+						Canstart = true -- can run the mission
 					end
 				end
+				while CanStartAmbush do
+					Wait(0)
 
+					if not AreMissionPedsAlive() then -- is all entities dead
+						CanStartAmbush = false
+						Canstart = true
+						TriggerEvent('vorp:ShowTopNotification', "~e~You Have Defeated The Bandits!", "Safe Travels...", 4000)
+						for k, ped in ipairs(myCreatedPeds) do
+							print(ped, k)
+							table.remove { myCreatedPeds, k } -- remove from table
+							SetEntityAsNoLongerNeeded(ped) -- engine will remove leave the dead 
+							myCreatedPeds = {}
+							Canstart = true
+							print("available")
+
+							TriggerServerEvent("name", key)
+							print(key)
+						end
+					end
+
+					if IsPlayerDead(playerID) then
+						CanStartAmbush = false
+						Canstart = true
+						for k, ped in ipairs(myCreatedPeds) do
+							if DoesEntityExist(ped) then
+								table.remove { myCreatedPeds, k }
+								SetEntityAsNoLongerNeeded(ped) -- no longer needed engine will delete them
+								--Wait(Location.TimeToDeleteAlivePeds) -- wait incase you want players to come save him before deleting
+								DeletePed(ped)
+								DeleteEntity(ped) -- delete all created
+								myCreatedPeds = {}
+								--Canstart = true
+								TriggerServerEvent("name", key)
+								print(key)
+							end
+						end
+					end
+
+				end
 			end
-			--end
 		end
-		Wait(0)
+		if sleep then
+			Wait(3000)
+		end
+
 	end
 end)
 
-Citizen.CreateThread(function()
 
-	while true do
-		Citizen.Wait(0)
-		local playerPed = PlayerPedId()
-		local coords = GetEntityCoords(playerPed)
 
-		for k, v in pairs(Config.holdup.second) do
-			local distance = GetDistanceBetweenCoords(coords, v['x'], v['y'], v['z'], true)
-			if distance < 3.0 and not already then
-				local random = math.random(1, 10)
-				if random <= Config.lotterynumber then
 
-					print(random)
-					startdialog2()
-					missionstart2()
-
-					already = true
-
-				else
-					if random > 2 and not already == true then
-						stopmission()
-						print(random)
-					end
-				end
-
-			end
+AddEventHandler('onResourceStop', function()
+	for k, ped in ipairs(myCreatedPeds) do
+		if DoesEntityExist(ped) then
+			table.remove { myCreatedPeds, k }
+			DeletePed(ped) --delete
+			DeleteEntity(ped) -- delete after a certain time in case you have friends to save you 
+			SetEntityAsNoLongerNeeded(ped) -- no longer needed engine will delete them
+			myCreatedPeds = {}
 		end
-
 	end
+	Canstart = true
+end)
+
+RegisterNetEvent("vorp_outlaws:canstart", function(can)
+	CanstartMission = can
 end)

@@ -2,22 +2,23 @@ Config = {}
 
 Config.Cooldown = 540000 -- 9 minutes
 
-
-
-
-Config.Bandits = {
+Config.Outlaws = {
 
 	firstLocation = {
-
-		luckynumber = 3,
+		Random = { min = 1, max = 1 },
+		luckynumber = 1,
+		CheckLuckyNumber = 10000, -- in how many miliseconds should check the lucky number when crossing the location. if you put 0 it will defenitly spawn npcs Advise to keep it 50000
 		x = -1406.96, y = -965.50, z = 61.75, -- location to get notified
+		BlipHandle = 953018525,
+		DistanceTriggerMission = 13.0,
+		TimeToDeleteAlivePeds = 50000,
 		outlawsLocation = {
-			{ x = -1364.3565673828125, y = -966.014404296875, z = 72.52660369873047 }, -- location to spawn peds for each ped
-			{ x = -1369.3565673828125, y = -960.014404296875, z = 72.52660369873047 },
-			{ x = -1391.3565673828125, y = -985.014404296875, z = 72.52660369873047 },
+			{ x = -1364.356, y = -966.014, z = 72.52 }, -- location to spawn peds for each ped
+			{ x = -1369.356, y = -960.0144, z = 72.52 },
+			{ x = -1391.35, y = -985.014, z = 72.52 },
 			{ x = -1480.86, y = -915.48, z = 80.94 },
-			{ x = -1491.77, y = -944.48, z = 88.94 },
-			{ x = -1491.77, y = -944.48, z = 88.94 },
+			--{ x = -1491.77, y = -944.48, z = 88.94 },
+			--{ x = -1491.77, y = -944.48, z = 88.94 },
 		},
 		outlawsModels = {
 			{ hash = "G_M_M_UniBanditos_01" }, -- models it will pick a random model
@@ -39,8 +40,13 @@ Config.Bandits = {
 	},
 
 	secondLocation = {
+		Random = { min = 1, max = 10 },
 		luckynumber = 3,
-		{ x = -1370.55, y = 1471.54, z = 241.58 }, -- beartooth pass
+		CheckLuckyNumber = 50000,
+		x = -1370.55, y = 1471.54, z = 241.58, -- beartooth pass
+		BlipHandle = 953018525,
+		DistanceTriggerMission = 13.0,
+		TimeToDeleteAlivePeds = 50000,
 		outlawsLocation = {
 			{ x = -1362.81982421875, y = 1429.0799560546875, z = 234.40966796875 },
 			{ x = -1366.81982421875, y = 1428.0799560546875, z = 235.40966796875 },
@@ -66,8 +72,13 @@ Config.Bandits = {
 	},
 
 	thirdLocation = {
+		Random = { min = 1, max = 12 },
 		luckynumber = 3,
-		{ x = 356.13, y = 442.88, z = 111.37 }, -- Citadel Rock area
+		CheckLuckyNumber = 50000,
+		x = 356.13, y = 442.88, z = 111.37, -- Citadel Rock area
+		BlipHandle = 953018525,
+		DistanceTriggerMission = 13.0,
+		TimeToDeleteAlivePeds = 50000,
 		outlawsLocation = {
 			{ x = 466.03, y = 376.79, z = 106.49 },
 			{ x = 450.94, y = 367.32, z = 104.30 },
@@ -93,8 +104,13 @@ Config.Bandits = {
 	},
 
 	fourthLocation = {
-		luckynumber = 3,
-		{ x = 2163.16, y = -1329.416, z = 42.50 }, -- Slaughter House Bridge
+		Random = { min = 1, max = 10 },
+		luckynumber = 1,
+		CheckLuckyNumber = 50000,
+		x = 2163.16, y = -1329.416, z = 42.50, -- Slaughter House Bridge
+		BlipHandle = 953018525,
+		DistanceTriggerMission = 13.0,
+		TimeToDeleteAlivePeds = 50000,
 		outlawsLocation = {
 			{ x = 2160.73, y = -1315.26, z = 41.35 },
 			{ x = 2160.73, y = -1313.26, z = 41.39 },
