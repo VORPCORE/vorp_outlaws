@@ -4,7 +4,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 author 'VORP edit by @outsider'
 lua54 'yes'
-description 'Bank system VORP'
+description 'Outlaw ambush npcs'
 
 client_scripts {
 	'client/*.lua',

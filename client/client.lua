@@ -17,19 +17,19 @@ function CreateMissionPed(model, position, blipSprite, pedToAttack)
 		print("Model is not loaded in the CDI")
 		return;
 	end
-	while not HasModelLoaded(modelHash) do -- might want to runa  failure count
+	while not HasModelLoaded(modelHash) do
 		RequestModel(modelHash)
 		Citizen.Wait(0)
 	end
 	local createdped = CreatePed(modelHash, position.x, position.y, position.z, true, true, false, false)
 
 	if DoesEntityExist(createdped) then
-		Citizen.InvokeNative(0x283978A15512B2FE, createdped, true) -- random outfit
-		Citizen.InvokeNative(0x23f74c2fda6e7c61, blipSprite, createdped) -- blip 
-		TaskCombatPed(createdped, pedToAttack) -- combat ped
+		Citizen.InvokeNative(0x283978A15512B2FE, createdped, true)
+		Citizen.InvokeNative(0x23f74c2fda6e7c61, blipSprite, createdped)
+		TaskCombatPed(createdped, pedToAttack)
 		SetEntityAsMissionEntity(createdped, true, true)
 		Citizen.InvokeNative(0x740CB4F3F602C9F4, createdped, true); -- This script must clean up, set false if there are issues
-		myCreatedPeds[#myCreatedPeds + 1] = createdped -- add to table
+		myCreatedPeds[#myCreatedPeds + 1] = createdped
 		SetModelAsNoLongerNeeded(modelHash)
 	end
 end
@@ -41,13 +41,12 @@ function CreateMissionPeds(currentMission, numberToSpawn)
 		return
 	end
 
-	print("Creating peds for mission")
 	local playerToAttack = PlayerPedId()
 
 	for x = 1, numberToSpawn do
-		local numberOfAlivePeds = GetNumberOfAliveMissionPeds() -- check how many are alive
+		local numberOfAlivePeds = GetNumberOfAliveMissionPeds()
 
-		if numberOfAlivePeds >= currentMission.MaxAlive then -- if number of alive is more or equals config max alive then stop creating.
+		if numberOfAlivePeds >= currentMission.MaxAlive then
 			return
 		end
 
@@ -102,20 +101,18 @@ function CleanUpAndReset(Deletenpc)
 	for _, ped in ipairs(myCreatedPeds) do
 		if DoesEntityExist(ped) then
 			if Deletenpc then
-				DeletePed(ped) --delete
-				DeleteEntity(ped) -- delete after a certain time in case you have friends to save you 
+				DeletePed(ped)
+				DeleteEntity(ped)
 			end
 
 			SetEntityAsMissionEntity(ped, false, false)
-			SetEntityAsNoLongerNeeded(ped) -- no longer needed engine will delete them
+			SetEntityAsNoLongerNeeded(ped)
 		end
 	end
-	TriggerServerEvent("vorp_outlaws:remove", LocationName) -- remove from server and allow other players to trigger mission
+	TriggerServerEvent("vorp_outlaws:remove", LocationName)
 	LocationName = ""
 	myCreatedPeds = {}
 	NameLocation = {}
-	Wait(NameLocation.CheckLuckyNumber)
-	print(NameLocation.CheckLuckyNumber)
 	CanStart = 1
 end
 
@@ -125,15 +122,13 @@ function MissionPedManager()
 			while not CanSpawnPeds do
 				Wait(0)
 
-				if #myCreatedPeds == NameLocation.MaxPeds then -- if achieved then
-					print("loop stop peds creating")
-					CanSpawnPeds = true -- stop loop if max peds is achieved
+				if #myCreatedPeds == NameLocation.MaxPeds then
+					CanSpawnPeds = true
 				end
 
 				local numberOfAlivePeds = GetNumberOfAliveMissionPeds()
-				if numberOfAlivePeds <= NameLocation.MaxAlive then -- if not reached max alive keep spawning when they die
-					print("keep creating")
-					CreateMissionPeds(NameLocation, math.random(NameLocation.RandomPedSpawn.min, NameLocation.RandomPedSpawn.max)) -- you can change this randomiser
+				if numberOfAlivePeds <= NameLocation.MaxAlive then
+					CreateMissionPeds(NameLocation, math.random(NameLocation.RandomPedSpawn.min, NameLocation.RandomPedSpawn.max))
 				end
 			end
 		end
@@ -149,21 +144,17 @@ end)
 
 RegisterNetEvent("vorp_outlaws:canstart", function(can)
 	CanStartSecondState = can
+	print(can)
 end)
 
 
 CreateThread(function()
 
-	while StartLoop == false do
+	while StartLoop do
 		Wait(0)
-		print("loop started")
 		local playerID = PlayerId()
 		local playerDead = IsPlayerDead(playerID)
 
-		if CanStart == 0 then
-			CleanUpAndReset(true)
-			--StartLoop = false -- stop loop npcs are dead or player escaped or player is dead
-		end
 		if CanStart == 1 then
 			for key, Location in pairs(Config.Outlaws) do
 				local distance = GetPlayerDistanceFromCoords(Location.x, Location.y, Location.z)
@@ -181,7 +172,7 @@ CreateThread(function()
 			if random == NameLocation.luckynumber then -- check if player is lucky
 				TriggerServerEvent("vorp_outlaws:check", LocationName) -- check if can start
 				Wait(2000) -- give time to update
-
+				print(CanStartSecondState)
 				if CanStartSecondState and not playerDead then
 					local numberOfAlivePeds = GetNumberOfAliveMissionPeds()
 
@@ -191,19 +182,19 @@ CreateThread(function()
 						Wait(100)
 						MissionPedManager()
 						CanStart = 3
-						TriggerEvent('vorp:ShowTopNotification', "~e~AMBUSH", NameLocation.Notification, 2000)
+						TriggerEvent('vorp:ShowTopNotification', NameLocation.NotificationTitle, NameLocation.Notification, 2000)
 
 
 					end
 				else -- if someone is being ambushed cant start
-					Wait(NameLocation.CheckLuckyNumber) -- add a wait untill the mission can run again to stop looping
+					Wait(Config.Cooldown) -- add a wait untill the mission can run again to stop looping
 					CanStart = 1 -- can start
 					StartLoop = true -- start loop
 
 				end
 
 			else -- not lucky
-				Wait(NameLocation.CheckLuckyNumber) -- add a wait untill the mission can run again to stop looping
+				Wait(Config.Cooldown) -- add a wait untill the mission can run again to stop looping
 				CanStart = 1 -- can start
 				StartLoop = true -- start loop
 			end
@@ -216,23 +207,35 @@ CreateThread(function()
 			-- If the player has killed all the allowed peds to be spawned, then the area is cleared.
 			if numberOfPedsKilled == NameLocation.MaxPeds then
 				CanSpawnPeds = true
-				TriggerEvent('vorp:ShowTopNotification', "you have killed them all", "Safe Travels...", 4000)
-				CanStart = 0
+				Wait(200)
+				StartLoop = false
+				TriggerEvent('vorp:ShowTopNotification', NameLocation.NotificationKilledTitle, NameLocation.NotificationKilled, 4000)
+				CleanUpAndReset(false)
+				Wait(Config.Cooldown)
+				StartLoop = true
 			end
-
 
 			if DistanceFromArea > NameLocation.DistanceToStopAmbush then
 				CanSpawnPeds = true
-				TriggerEvent('vorp:ShowTopNotification', "!you have escaped!", "keep an eye on the road", 4000)
-				CanStart = 0
+				Wait(200)
+				StartLoop = false
+				TriggerEvent('vorp:ShowTopNotification', NameLocation.NotificationEscapeTitle, NameLocation.NotificationEscape, 4000)
+				CleanUpAndReset(true)
+				Wait(Config.Cooldown)
+				StartLoop = true
+
+
 			end
 
 			if IsPlayerDead(playerID) then -- if player dead
 				CanSpawnPeds = true
-
-				TriggerEvent('vorp:updatemissioNotify', "!you have been killed!", "bandits will stay for awhile", 4000)
-				CanStart = 0
-
+				Wait(200)
+				StartLoop = false
+				TriggerEvent('vorp:updatemissioNotify', NameLocation.NotificationDiedTitle, NameLocation.NotificationDied, 4000)
+				Wait(Config.DeleteNPcsAfterPlayerDied)
+				CleanUpAndReset(true)
+				Wait(Config.Cooldown)
+				StartLoop = true
 			end
 
 		end
