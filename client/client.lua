@@ -24,6 +24,9 @@ function CreateMissionPed(model, position, blipSprite, pedToAttack)
 	local createdped = CreatePed(modelHash, position.x, position.y, position.z, true, true, false, false)
 
 	if DoesEntityExist(createdped) then
+		SetPedRelationshipGroupHash(createdped, `bandits`)
+		SetRelationshipBetweenGroups(5, `PLAYER`, `bandits`)
+		SetRelationshipBetweenGroups(5, `bandits`, `PLAYER`)
 		Citizen.InvokeNative(0x283978A15512B2FE, createdped, true)
 		Citizen.InvokeNative(0x23f74c2fda6e7c61, blipSprite, createdped)
 		TaskCombatPed(createdped, pedToAttack)
