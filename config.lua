@@ -11,7 +11,6 @@ Config.Outlaws = {
 		x = -1406.96, y = -965.50, z = 61.75, -- location that triggers the ambush
 		BlipHandle = 953018525, -- sprite of the npc blip. dont change
 		DistanceTriggerMission = 13.0, -- distance from the location to trigger the ambush
-		TimeToDeleteAlivePeds = 300000, --[ 300000 is = to 5 minutes.] if peds kill player time to delte peds for example you can be with someone and he can keep fighting then or someone can pass by and kill them to revive you
 		DistanceToStopAmbush = 80, -- distance to stop the ambush when player is 150 away then ambush will stop
 		MaxPeds = 10, -- this says dont spawn more than 10 per wave
 		MaxAlive = 4, -- spawn how many - then when killed will keep spawning untill has reached MXAPEDS ^
@@ -49,7 +48,6 @@ Config.Outlaws = {
 		x = -1370.55, y = 1471.54, z = 241.58, -- beartooth pass
 		BlipHandle = 953018525,
 		DistanceTriggerMission = 13.0,
-		TimeToDeleteAlivePeds = 50000,
 		DistanceToStopAmbush = 150,
 		MaxPeds = 10,
 		MaxAlive = 7,
@@ -84,7 +82,6 @@ Config.Outlaws = {
 		x = 356.13, y = 442.88, z = 111.37, -- Citadel Rock area
 		BlipHandle = 953018525,
 		DistanceTriggerMission = 13.0,
-		TimeToDeleteAlivePeds = 50000,
 		DistanceToStopAmbush = 150,
 		MaxPeds = 10,
 		MaxAlive = 7,
@@ -119,7 +116,6 @@ Config.Outlaws = {
 		x = 2163.16, y = -1329.416, z = 42.50,
 		BlipHandle = 953018525,
 		DistanceTriggerMission = 13.0,
-		TimeToDeleteAlivePeds = 50000,
 		DistanceToStopAmbush = 150,
 		MaxPeds = 10,
 		MaxAlive = 7,
