@@ -4,6 +4,7 @@ An outlaw ambush script
 # installation
 - `ensure vorp_outlaws` in your `resources.cfg` file
 - configure the script to your likings
+- you can use the map xml file to spawn a camp for one of the locations you need `objectloader` script or convert to ymap
 
 # description
 - unique locations
