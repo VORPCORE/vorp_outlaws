@@ -6,12 +6,12 @@ Config.DeleteNPcsAfterPlayerDied = 1000 * 60 -- after player is dead delte npcs 
 Config.Outlaws = {
 
 	firstLocation = {
-		Random = { min = 1, max = 1 }, -- set between min and max how lucky a player will be to trigger an ambush
+		Random = { min = 1, max = 10 }, -- set between min and max how lucky a player will be to trigger an ambush
 		luckynumber = 1, -- if the random number = this number then start ambush
 		x = -1406.96, y = -965.50, z = 61.75, -- location that triggers the ambush
 		BlipHandle = 953018525, -- sprite of the npc blip. dont change
-		DistanceTriggerMission = 13.0, -- distance from the location to trigger the ambush
-		DistanceToStopAmbush = 80, -- distance to stop the ambush when player is 150 away then ambush will stop
+		DistanceTriggerMission = 18.0, -- distance from the location to trigger the ambush
+		DistanceToStopAmbush = 150, -- distance to stop the ambush when player is 150 away then ambush will stop
 		MaxPeds = 10, -- this says dont spawn more than 10 per wave
 		MaxAlive = 4, -- spawn how many - then when killed will keep spawning untill has reached MXAPEDS ^
 		RandomPedSpawn = { min = 1, max = 3 }, -- random amount to spawn at first
@@ -77,7 +77,7 @@ Config.Outlaws = {
 	},
 
 	thirdLocation = {
-		Random = { min = 1, max = 1 },
+		Random = { min = 1, max = 10 },
 		luckynumber = 1,
 		x = 356.13, y = 442.88, z = 111.37, -- Citadel Rock area
 		BlipHandle = 953018525,
