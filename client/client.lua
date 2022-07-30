@@ -116,7 +116,6 @@ function CleanUpAndReset(Deletenpc)
 	LocationName = ""
 	myCreatedPeds = {}
 	NameLocation = {}
-	CanStart = 1
 end
 
 function MissionPedManager()
@@ -209,6 +208,7 @@ CreateThread(function()
 
 			-- If the player has killed all the allowed peds to be spawned, then the area is cleared.
 			if numberOfPedsKilled == NameLocation.MaxPeds then
+				CanStart = 1
 				CanSpawnPeds = true
 				Wait(200)
 				StartLoop = false
@@ -219,6 +219,7 @@ CreateThread(function()
 			end
 
 			if DistanceFromArea > NameLocation.DistanceToStopAmbush then
+				CanStart = 1
 				CanSpawnPeds = true
 				Wait(200)
 				StartLoop = false
@@ -231,6 +232,7 @@ CreateThread(function()
 			end
 
 			if IsPlayerDead(playerID) then -- if player dead
+				CanStart = 1
 				CanSpawnPeds = true
 				Wait(200)
 				StartLoop = false
