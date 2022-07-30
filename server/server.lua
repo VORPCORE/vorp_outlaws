@@ -45,5 +45,4 @@ end)
 RegisterServerEvent("vorp_outlaws:remove", function(removeAmbush)
     local _source = source
     RemoveFromTableByName(ActiveMissions, removeAmbush)
-    print(RemoveFromTableByName(ActiveMissions, removeAmbush))
 end)
