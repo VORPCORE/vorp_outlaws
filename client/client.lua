@@ -5,7 +5,7 @@ local CanSpawnPeds = true
 local CanStart = 1
 local NameLocation = {}
 local StartLoop = true
-local near = 1000
+local near = 100
 
 
 
@@ -168,7 +168,7 @@ CreateThread(function()
 					NameLocation = Location
 					CanStart = 2
 				else
-				      near = 1000
+				      near = 100
 				end
 			end
 		end
