@@ -5,6 +5,7 @@ local CanSpawnPeds = true
 local CanStart = 1
 local NameLocation = {}
 local StartLoop = true
+local near = 1000
 
 
 
@@ -153,7 +154,7 @@ end)
 CreateThread(function()
 
 	while StartLoop do
-		Wait(0)
+		Wait(near)
 		local playerID = PlayerId()
 		local playerDead = IsPlayerDead(playerID)
 
@@ -162,9 +163,12 @@ CreateThread(function()
 				local distance = GetPlayerDistanceFromCoords(Location.x, Location.y, Location.z)
 
 				if distance <= Location.DistanceTriggerMission then
+					near = 0
 					LocationName = key
 					NameLocation = Location
 					CanStart = 2
+				else
+				      near = 1000
 				end
 			end
 		end
