@@ -23,7 +23,9 @@ function CreateMissionPed(model, position, blipSprite, pedToAttack)
 		Citizen.Wait(0)
 	end
 	local createdped = CreatePed(modelHash, position.x, position.y, position.z, true, true, false, false)
-
+        while not createdped then
+	 Wait(0)
+        end
 	if DoesEntityExist(createdped) then
 		SetPedRelationshipGroupHash(createdped, `bandits`)
 		SetRelationshipBetweenGroups(5, `PLAYER`, `bandits`)
@@ -147,7 +149,6 @@ end)
 
 RegisterNetEvent("vorp_outlaws:canstart", function(can)
 	CanStartSecondState = can
-	print(can)
 end)
 
 
