@@ -23,7 +23,7 @@ function CreateMissionPed(model, position, blipSprite, pedToAttack)
 		Citizen.Wait(0)
 	end
 	local createdped = CreatePed(modelHash, position.x, position.y, position.z, true, true, false, false)
-        while not createdped then
+        while not createdped do
 	 Wait(0)
         end
 	if DoesEntityExist(createdped) then
