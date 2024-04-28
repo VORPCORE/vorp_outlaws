@@ -3,7 +3,6 @@ local ActiveMissions = {}
 function IsMissionActive(key)
     for _, mission in pairs(ActiveMissions) do
         if key == mission then
-
             return true
         end
     end
@@ -26,7 +25,7 @@ function RemoveFromTableByName(ActiveMissions, removeAmbush)
     return true
 end
 
-RegisterServerEvent("vorp_outlaws:check", function(ambushLocation)
+RegisterNetEvent("vorp_outlaws:check", function(ambushLocation)
     local _source = source
 
     if IsMissionActive(ambushLocation) then
@@ -38,11 +37,9 @@ RegisterServerEvent("vorp_outlaws:check", function(ambushLocation)
         CanStart = true
         TriggerClientEvent("vorp_outlaws:canstart", _source, CanStart)
     end
-
-
 end)
 
-RegisterServerEvent("vorp_outlaws:remove", function(removeAmbush)
+RegisterNetEvent("vorp_outlaws:remove", function(removeAmbush)
     local _source = source
     RemoveFromTableByName(ActiveMissions, removeAmbush)
 end)
